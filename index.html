@@ -3,28 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Feliz Cumpleaños Hermano!</title>
+    <title>¡Feliz Cumpleaños Bastian Boettcher! 🎉</title>
     <style>
-        body { font-family: Arial; text-align: center; background: linear-gradient(to right, #ff7e5f, #feb47b); color: white; }
-        h1 { font-size: 3em; animation: bounce 2s infinite; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            text-align: center; 
+            background: linear-gradient(-45deg, #ff7e5f, #feb47b, #ff6b6b, #feca57); 
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: white; 
+            height: 100vh; 
+            overflow: hidden;
+            cursor: pointer;
+        }
+        @keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        h1 { font-size: clamp(2em, 8vw, 4em); animation: bounce 2s infinite, glow 2s ease-in-out infinite alternate; margin-top: 20vh; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-30px); } 60% { transform: translateY(-15px); } }
-        button { font-size: 2em; padding: 20px; background: #ff4757; color: white; border: none; border-radius: 50px; cursor: pointer; }
-        #mensaje { display: none; font-size: 1.5em; margin-top: 50px; }
+        @keyframes glow { from { text-shadow: 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #ff4757; } to { text-shadow: 0 0 30px #fff, 0 0 40px #ff4757, 0 0 50px #ff4757; } }
+        p { font-size: 1.5em; margin: 20px 0; }
+        button { 
+            font-size: clamp(1.2em, 5vw, 2em); padding: 20px 40px; 
+            background: linear-gradient(45deg, #ff4757, #ff6b6b); 
+            color: white; border: none; border-radius: 50px; cursor: pointer; 
+            box-shadow: 0 10px 30px rgba(255,71,87,0.4); transition: all 0.3s;
+        }
+        button:hover { transform: scale(1.1); box-shadow: 0 15px 40px rgba(255,71,87,0.6); }
+        button:active { transform: scale(0.95); }
+        #mensaje { display: none; animation: fadeIn 1s ease-in; margin-top: 50px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        #mensaje h2 { font-size: 2.5em; margin-bottom: 20px; }
+        .confeti { position: fixed; width: 10px; height: 10px; background: #ff4757; pointer-events: none; z-index: 1000; }
+        @media (max-width: 600px) { h1 { margin-top: 10vh; } }
     </style>
 </head>
-<body>
-    <h1>🎉 ¡FELIZ CUMPLEAÑOS HERMANO! 🎉</h1>
-    <p>¡Toca el botón para tu sorpresa!</p>
-    <button onclick="mostrarMensaje()">¡Abrir regalo!</button>
+<body onclick="mostrarMensaje()">
+    <!-- Música de fondo (derecho clic > guardar como 'music.mp3' y súbela al repo) -->
+    <audio id="music" loop preload="auto">
+        <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav"> <!-- Sonido gratuito ejemplo -->
+    </audio>
+    
+    <h1>🎉 ¡FELIZ CUMPLEAÑOS Bastiancito! 🎉</h1>
+    <p>¡Toca en cualquier parte para la sorpresa! 🎁</p>
+    <button>¡Abrir tu regalo especial! 🎂</button>
+    
     <div id="mensaje">
-        <h2>¡Eres el mejor hermano del mundo!</h2>
-        <p>¡Que este año sea increíble! Te quiero mucho. 🎂🥳</p>
+        <h2>¡Eres el MEJOR hermano del mundo! ❤️</h2>
+        <p>¡Gracias por todos los momentos increíbles! Este año será ÉPICO. Te quiero mucho. 🥳✨</p>
+        <p style="font-size: 1.2em; margin-top: 30px;">¡Comparte con todas las personas que te queremos! 🎈</p>
     </div>
+
     <script>
+        // Música auto
+        document.addEventListener('click', () => document.getElementById('music').play(), { once: true });
+        
         function mostrarMensaje() {
             document.getElementById('mensaje').style.display = 'block';
             document.querySelector('button').style.display = 'none';
+            document.querySelector('p').style.display = 'none';
+            crearConfeti();
         }
+        
+        // Confeti animado
+        function crearConfeti() {
+            for(let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    let confeti = document.createElement('div');
+                    confeti.className = 'confeti';
+                    confeti.style.left = Math.random() * 100 + 'vw';
+                    confeti.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
+                    confeti.style.animation = `fall ${3 + Math.random()*2}s linear forwards`;
+                    document.body.appendChild(confeti);
+                    setTimeout(() => confeti.remove(), 5000);
+                }, i * 20);
+            }
+        }
+        
+        // Estilo confeti
+        let style = document.createElement('style');
+        style.textContent = `
+            @keyframes fall {
+                to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Fullscreen en móvil
+        document.addEventListener('touchstart', () => {}, { passive: true });
     </script>
 </body>
 </html>
