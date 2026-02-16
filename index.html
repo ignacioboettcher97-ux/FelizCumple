@@ -32,9 +32,18 @@
         button:active { transform: scale(0.95); }
         #mensaje { display: none; animation: fadeIn 1s ease-in; margin-top: 50px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        #mensaje h2 { font-size: 2.5em; margin-bottom: 20px; }
+        #mi-imagen {
+            max-width: 90vw;
+            max-height: 40vh;
+            width: auto;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255,255,255,0.5);
+            margin: 20px auto;
+            animation: bounce 2s infinite;
+        }
         .confeti { position: fixed; width: 10px; height: 10px; background: #ff4757; pointer-events: none; z-index: 1000; }
-        @media (max-width: 600px) { h1 { margin-top: 10vh; } }
+        @media (max-width: 600px) { h1 { margin-top: 10vh; } #mi-imagen { max-height: 30vh; } }
     </style>
 </head>
 <body onclick="mostrarMensaje()">
@@ -48,6 +57,7 @@
     <button>¡Abrir tu regalo especial! 🎂</button>
     
     <div id="mensaje">
+        <img id="mi-imagen" src="imagen.jpg" alt="Foto especial para Bastian 🎈"> <!-- ¡Aquí va tu imagen! Cambia 'imagen.jpg' -->
         <h2>¡Eres el MEJOR hermano del mundo! ❤️</h2>
         <p>¡Gracias por todos los momentos increíbles! Este año será ÉPICO. Te quiero mucho. 🥳✨</p>
         <p style="font-size: 1.2em; margin-top: 30px;">¡Comparte con todas las personas que te queremos! 🎈</p>
