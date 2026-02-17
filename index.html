@@ -13,8 +13,8 @@
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
             color: white; 
-            height: 100vh; 
-            overflow: hidden;
+            min-height: 100vh; 
+            overflow: auto;
             cursor: pointer;
         }
         @keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -30,26 +30,30 @@
         }
         button:hover { transform: scale(1.1); box-shadow: 0 15px 40px rgba(255,71,87,0.6); }
         button:active { transform: scale(0.95); }
-        #mensaje { display: none; animation: fadeIn 1s ease-in; margin-top: 50px; }
+        #mensaje { display: none; animation: fadeIn 1s ease-in; padding: 20px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        #mi-imagen {
-            max-width: 90vw;
-            max-height: 40vh;
-            width: auto;
-            height: auto;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(255,255,255,0.5);
-            margin: 20px auto;
-            animation: bounce 2s infinite;
-        }
+        #mi-imagen { max-width: 90vw; max-height: 30vh; width: auto; height: auto; border-radius: 20px; box-shadow: 0 10px 30px rgba(255,255,255,0.5); margin: 20px auto; }
+        /* Torta CSS */
+        .cake-container { margin: 20px auto; max-width: 300px; position: relative; }
+        .cake { width: 250px; height: 150px; margin: 0 auto; position: relative; }
+        .plate { width: 280px; height: 30px; background: #d4af37; border-radius: 50%; margin: 0 auto; }
+        .layers { position: relative; }
+        .layer { position: absolute; left: 50%; transform: translateX(-50%); background: linear-gradient(#ff69b4, #ffb6c1); border-radius: 50% 50% 40% 40%; box-shadow: inset 0 -5px 10px rgba(0,0,0,0.2); }
+        .layer1 { width: 200px; height: 50px; bottom: 0; }
+        .layer2 { width: 160px; height: 40px; bottom: 45px; }
+        .layer3 { width: 120px; height: 35px; bottom: 80px; }
+        .candle { position: absolute; width: 8px; height: 30px; background: #f0f0f0; top: 20px; border-radius: 4px 4px 0 0; cursor: pointer; z-index: 10; transition: all 0.3s; }
+        .candle::before { content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 12px; height: 12px; background: #ffeb3b; border-radius: 50%; box-shadow: 0 0 10px #fff; animation: flicker 0.5s infinite alternate; }
+        .candle.blow-out { height: 25px; background: #ccc; }
+        .candle.blow-out::before { display: none; }
+        @keyframes flicker { 0% { box-shadow: 0 0 10px #fff; } 100% { box-shadow: 0 0 20px #ffeb3b, 0 0 30px #ff9800; } }
         .confeti { position: fixed; width: 10px; height: 10px; background: #ff4757; pointer-events: none; z-index: 1000; }
-        @media (max-width: 600px) { h1 { margin-top: 10vh; } #mi-imagen { max-height: 30vh; } }
+        @media (max-width: 600px) { h1 { margin-top: 10vh; } .cake { width: 200px; height: 120px; } }
     </style>
 </head>
 <body onclick="mostrarMensaje()">
-    <!-- Música de fondo (derecho clic > guardar como 'music.mp3' y súbela al repo) -->
     <audio id="music" loop preload="auto">
-        <source src="music.mp3" type="audio/wav"> <!-- Sonido gratuito ejemplo -->
+        <source src="music.mp3" type="audio/wav">
     </audio>
     
     <h1>🎉 ¡FELIZ CUMPLEAÑOS Bastiancito! 🎉</h1>
@@ -57,24 +61,71 @@
     <button>¡Abrir tu regalo especial! 🎂</button>
     
     <div id="mensaje">
-        <img id="mi-imagen" src="imagen.jpg" alt="Foto especial para Bastian 🎈"> <!-- ¡Aquí va tu imagen! Cambia 'imagen.jpg' -->
+        <img id="mi-imagen" src="imagen.jpg" alt="Foto especial para Bastian 🎈">
+        <div class="cake-container">
+            <div class="plate"></div>
+            <div class="cake">
+                <div class="layers">
+                    <div class="layer layer1"></div>
+                    <div class="layer layer2"></div>
+                    <div class="layer layer3"></div>
+                </div>
+                <div class="candle" style="left: 30%;" onclick="blowCandle(this)"></div>
+                <div class="candle" style="left: 40%;" onclick="blowCandle(this)"></div>
+                <div class="candle" style="left: 50%;" onclick="blowCandle(this)"></div>
+                <div class="candle" style="left: 60%;" onclick="blowCandle(this)"></div>
+                <div class="candle" style="left: 70%;" onclick="blowCandle(this)"></div>
+            </div>
+            <p>¡Sopla las velas con el micrófono o tócalas! 🎂💨</p>
+        </div>
         <h2>¡Eres el MEJOR hermano del mundo! ❤️</h2>
         <p>¡Gracias por todos los momentos increíbles! Este año será ÉPICO. Te quiero mucho. 🥳✨</p>
-        <p style="font-size: 1.2em; margin-top: 30px;">¡Comparte con todas las personas que te queremos! 🎈</p>
     </div>
 
     <script>
-        // Música auto
-        document.addEventListener('click', () => document.getElementById('music').play(), { once: true });
-        
+        let audioContext, analyser, dataArray, source;
+        document.addEventListener('click', () => {
+            document.getElementById('music').play().catch(() => {});
+            if (!audioContext) initMic();
+        }, { once: true });
+
+        function initMic() {
+            if (!navigator.mediaDevices) return;
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                source = audioContext.createMediaStreamSource(stream);
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                dataArray = new Uint8Array(analyser.fftSize);
+                source.connect(analyser);
+                detectBlow();
+            }).catch(() => console.log('Mic no disponible, usa clics'));
+        }
+
+        function detectBlow() {
+            const blowThreshold = 150; // Ajusta sensibilidad
+            setInterval(() => {
+                if (analyser) {
+                    analyser.getByteFrequencyData(dataArray);
+                    const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
+                    if (avg > blowThreshold) {
+                        document.querySelectorAll('.candle:not(.blow-out)').forEach(candle => blowCandle(candle));
+                    }
+                }
+            }, 100);
+        }
+
+        function blowCandle(candle) {
+            candle.classList.add('blow-out');
+            if (document.querySelectorAll('.candle:not(.blow-out)').length === 0) crearConfeti();
+        }
+
         function mostrarMensaje() {
             document.getElementById('mensaje').style.display = 'block';
             document.querySelector('button').style.display = 'none';
             document.querySelector('p').style.display = 'none';
-            crearConfeti();
         }
-        
-        // Confeti animado
+
         function crearConfeti() {
             for(let i = 0; i < 100; i++) {
                 setTimeout(() => {
@@ -88,18 +139,10 @@
                 }, i * 20);
             }
         }
-        
-        // Estilo confeti
+
         let style = document.createElement('style');
-        style.textContent = `
-            @keyframes fall {
-                to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-            }
-        `;
+        style.textContent = `@keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }`;
         document.head.appendChild(style);
-        
-        // Fullscreen en móvil
-        document.addEventListener('touchstart', () => {}, { passive: true });
     </script>
 </body>
 </html>
